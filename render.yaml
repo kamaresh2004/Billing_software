@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: caddey-billing
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd billing-flask && python init_db.py && gunicorn --bind 0.0.0.0:$PORT --workers 2 "app:create_app()"
+    healthCheckPath: /healthz
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_NAME
+        value: Caddey Billing
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite:///instance/billing_pro.db
+      - key: SESSION_COOKIE_SECURE
+        value: "true"
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CASHIER_PASSWORD
+        sync: false

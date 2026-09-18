@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Settings | {{ app_name }}{% endblock %}
+{% block page_heading %}Settings{% endblock %}
+{% block content %}
+<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{{ url_for('index') }}">Workspace</a><i class="bi bi-chevron-right" aria-hidden="true"></i><span>Settings</span></nav>
+<section class="page-intro"><div><p class="eyebrow">Workspace preferences</p><h2>Settings</h2><p class="muted">Choose how this workspace should look on this device.</p></div></section>
+<section class="panel settings-panel"><div class="panel-heading"><div><p class="eyebrow">Appearance</p><h3>Color theme</h3></div><i class="bi bi-palette" aria-hidden="true"></i></div><form class="settings-form" method="post"><label class="field"><select name="theme" aria-label="Color theme"><option value="light" {{ 'selected' if theme == 'light' else '' }}>Light</option><option value="dark" {{ 'selected' if theme == 'dark' else '' }}>Dark</option></select><span>Theme</span></label><button class="button button-primary" type="submit"><i class="bi bi-check-lg" aria-hidden="true"></i> Save settings</button></form></section>
+{% endblock %}
+{% block scripts %}<script>localStorage.setItem('billing-theme', '{{ theme }}'); document.documentElement.dataset.theme = '{{ theme }}';</script>{% endblock %}

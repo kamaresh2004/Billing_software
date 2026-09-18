@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Profile | {{ app_name }}{% endblock %}
+{% block page_heading %}Profile{% endblock %}
+{% block content %}
+<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{{ url_for('index') }}">Workspace</a><i class="bi bi-chevron-right" aria-hidden="true"></i><span>Profile</span></nav>
+<section class="page-intro"><div><p class="eyebrow">Your account</p><h2>Profile details</h2><p class="muted">Keep your team identity up to date.</p></div></section>
+<section class="panel settings-panel"><div class="profile-hero"><div class="avatar profile-avatar">{{ user.email[0]|upper }}</div><div><h3>{{ user.name }}</h3><p class="muted">{{ user.email }} · {{ user.role|title }}</p></div></div><form class="settings-form" method="post"><label class="field"><input name="name" value="{{ user.name }}" required maxlength="120" placeholder=" "><span>Display name</span></label><label class="field"><input value="{{ user.email }}" disabled placeholder=" "><span>Email address</span></label><button class="button button-primary" type="submit"><i class="bi bi-check-lg" aria-hidden="true"></i> Save profile</button></form></section>
+{% endblock %}

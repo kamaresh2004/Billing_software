@@ -17,7 +17,7 @@ from sqlalchemy import func, text
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 
 from models import AuditLog, Category, Customer, InvoiceCounter, Payment, Product, Sale, StockMovement, User, db
-from models import Purchase, PurchaseItem, Refund
+from models import Purchase, PurchaseItem, Refund, Supplier
 from pdf_invoice import build_invoice_pdf
 from config import BASE_DIR, config_for_environment
 
@@ -140,6 +140,37 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for("login"))
+
+
+@app.route("/profile", methods=["GET", "POST"])
+@login_required()
+def profile():
+    user = current_user()
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        if not name:
+            flash("Display name is required.", "error")
+        else:
+            user.name = name[:120]
+            db.session.commit()
+            app.logger.info("profile_updated user=%s", user.email)
+            flash("Profile updated.", "success")
+            return redirect(url_for("profile"))
+    return render_template("profile.html", user=user)
+
+
+@app.route("/settings", methods=["GET", "POST"])
+@login_required()
+def settings():
+    if request.method == "POST":
+        theme = request.form.get("theme", "light")
+        if theme not in {"light", "dark"}:
+            flash("Choose a valid theme.", "error")
+        else:
+            session["theme"] = theme
+            flash("Settings saved.", "success")
+            return redirect(url_for("settings"))
+    return render_template("settings.html", theme=session.get("theme", "light"))
 
 
 def password_serializer():

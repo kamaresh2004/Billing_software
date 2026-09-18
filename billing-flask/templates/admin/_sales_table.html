@@ -1,0 +1,36 @@
+<script>
+(function() {
+  const sel = document.getElementById('salesCompanyFilter');
+  if (sel) {
+    const companies = {{ companies|tojson }};
+    sel.innerHTML = '<option value="All">All companies</option>' +
+      companies.map(c => `<option value="${c}" ${c === "{{ selected_company }}" ? "selected" : ""}>${c}</option>`).join('');
+  }
+})();
+</script>
+<table class="table table-striped table-hover align-middle">
+  <thead>
+    <tr>
+      <th>Invoice #</th><th>Date</th><th>Product ID</th><th>Detail</th>
+      <th>Company</th><th class="numeric">Unit Price</th><th class="numeric">Qty</th><th class="numeric">Final Price</th><th>Cashier</th><th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in sales %}
+    <tr>
+      <td>{{ s.invoice_no }}</td>
+      <td>{{ s.date }}</td>
+      <td class="mono">{{ s.product_id }}</td>
+      <td>{{ s.detail }}</td>
+      <td>{{ s.company }}</td>
+      <td class="numeric">{{ s.unit_price }}</td>
+      <td class="numeric">{{ s.quantity }}</td>
+      <td class="numeric">{{ s.final_price }}</td>
+      <td>{{ s.cashier_name }}</td>
+      <td><form method="post" action="{{ url_for('refund_sale', sale_id=s.id) }}"><input type="hidden" name="quantity" value="1"><button class="button button-quiet" type="submit" title="Refund one unit"><i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Refund</button></form></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="10" class="empty-state"><i class="bi bi-receipt empty-icon" aria-hidden="true"></i><strong>No sales yet today</strong><br>Completed invoices will show up here.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>

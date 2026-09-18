@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Stock | {{ app_name }}{% endblock %}
+{% block page_heading %}Stock{% endblock %}
+{% block content %}
+<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{{ url_for('admin_dashboard') }}">Workspace</a><i class="bi bi-chevron-right" aria-hidden="true"></i><span>Stock</span></nav>
+<section class="page-intro"><div><p class="eyebrow">Inventory control</p><h2>Stock overview</h2><p class="muted">Monitor quantities and identify products that need attention.</p></div><a class="button button-primary" href="{{ url_for('admin_dashboard') }}#products"><i class="bi bi-plus-lg" aria-hidden="true"></i> Add product</a></section>
+<section class="panel data-page-panel"><div class="panel-heading"><div><p class="eyebrow">Live inventory</p><h3>All products</h3></div><span class="badge badge-green"><i class="bi bi-check-circle" aria-hidden="true"></i> Updated now</span></div><div class="filter-bar"><label class="field"><select id="stockCompanyFilter" aria-label="Filter stock by company"><option>All companies</option></select><span>Company</span></label><span class="muted"><i class="bi bi-info-circle" aria-hidden="true"></i> Status updates as sales are completed</span></div><div id="stockTable" class="ajax-table">{% include "admin/_stock_table.html" %}</div></section>
+<section class="panel data-page-panel purchase-panel"><div class="panel-heading"><div><p class="eyebrow">Inbound inventory</p><h3>Record purchase</h3></div><i class="bi bi-truck" aria-hidden="true"></i></div><form class="compact-form" method="post" action="{{ url_for('record_purchase') }}"><input name="product_id" required placeholder="Product ID" aria-label="Product ID"><input name="supplier" placeholder="Supplier" aria-label="Supplier"><input name="quantity" type="number" min="1" required placeholder="Quantity" aria-label="Purchase quantity"><input name="cost_price" type="number" min="0" step="0.01" required placeholder="Cost price" aria-label="Cost price"><button class="button button-secondary" type="submit"><i class="bi bi-box-arrow-in-down" aria-hidden="true"></i> Record purchase</button></form></section>
+{% endblock %}
+{% block scripts %}<script>
+const stockFilter = document.getElementById('stockCompanyFilter');
+stockFilter?.addEventListener('change', () => document.getElementById('stockTable')?.classList.add('content-fade-in'));
+</script>{% endblock %}

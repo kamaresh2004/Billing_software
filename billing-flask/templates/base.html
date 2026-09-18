@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f766e">
+  <title>{% block title %}{{ app_name }}{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+</head>
+<body>
+{% if session.get('user_id') %}
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="{{ url_for('index') }}"><img class="brand-logo" src="{{ url_for('static', filename='img/logo.svg') }}" alt=""><span class="brand-name">{{ app_name }}<small>Retail workspace</small></span></a>
+    <p class="nav-label">Workspace</p>
+    <nav class="nav-list" aria-label="Primary navigation">
+      {% if session.get('role') in ['admin', 'manager'] %}<a class="nav-link {{ 'is-active' if request.endpoint == 'admin_dashboard' else '' }}" href="{{ url_for('admin_dashboard') }}"><span><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span> Overview</a>{% endif %}
+      <a class="nav-link {{ 'is-active' if request.endpoint == 'invoice_page' else '' }}" href="{{ url_for('invoice_page') }}"><span><i class="bi bi-plus-circle-fill" aria-hidden="true"></i></span> New sale</a>
+      {% if session.get('role') in ['admin', 'manager'] %}
+      <a class="nav-link" href="{{ url_for('admin_dashboard') }}#products"><span><i class="bi bi-box-seam" aria-hidden="true"></i></span> Products</a>
+      <a class="nav-link" href="{{ url_for('admin_dashboard') }}#users"><span><i class="bi bi-people" aria-hidden="true"></i></span> Cashiers</a>
+      <a class="nav-link {{ 'is-active' if request.endpoint == 'admin_stock' else '' }}" href="{{ url_for('admin_stock') }}"><span><i class="bi bi-clipboard2-data" aria-hidden="true"></i></span> Stock</a>
+      <a class="nav-link {{ 'is-active' if request.endpoint == 'admin_sales' else '' }}" href="{{ url_for('admin_sales') }}"><span><i class="bi bi-receipt" aria-hidden="true"></i></span> Sales</a>
+      <a class="nav-link {{ 'is-active' if request.endpoint == 'reports' else '' }}" href="{{ url_for('reports') }}"><span><i class="bi bi-bar-chart-line" aria-hidden="true"></i></span> Reports</a>
+      {% if session.get('role') == 'admin' %}<a class="nav-link {{ 'is-active' if request.endpoint == 'audit_log' else '' }}" href="{{ url_for('audit_log') }}"><span><i class="bi bi-shield-check" aria-hidden="true"></i></span> Audit log</a>{% endif %}
+      {% endif %}
+    </nav>
+    <div class="sidebar-footer"><span class="status-dot"></span> Local workspace</div>
+  </aside>
+  <main class="main-panel">
+    <header class="topbar"><button class="icon-button menu-button" id="menuButton" aria-label="Toggle navigation" aria-controls="sidebar" aria-expanded="false"><i class="bi bi-list" aria-hidden="true"></i></button><div><p class="eyebrow">{{ app_name }}</p><h1>{% block page_heading %}Workspace{% endblock %}</h1></div><div class="topbar-user"><button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme" title="Switch color theme"><i class="bi bi-moon-stars" aria-hidden="true"></i></button><div class="user-menu" id="userMenu"><button class="user-trigger" type="button" aria-expanded="false" aria-controls="userMenuPanel"><div class="avatar">{{ session.get('email', 'U')[0]|upper }}</div><div class="user-meta"><strong>{{ session.get('email') }}</strong><span>{{ session.get('role')|title }}</span></div><i class="bi bi-chevron-down" aria-hidden="true"></i></button><div class="user-menu-panel" id="userMenuPanel"><span class="menu-note"><i class="bi bi-person-circle" aria-hidden="true"></i> Signed in as {{ session.get('role')|title }}</span><a href="#"><i class="bi bi-person" aria-hidden="true"></i> Profile</a><a href="#"><i class="bi bi-gear" aria-hidden="true"></i> Settings</a><a href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sign out</a></div></div></div></header>
+    <section class="content-area">
+      {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="toast-stack" aria-live="polite">{% for category, message in messages %}<div class="flash {{ 'flash-error' if category == 'error' else 'flash-success' }}" role="status"><i class="bi {{ 'bi-exclamation-circle' if category == 'error' else 'bi-check-circle' }}" aria-hidden="true"></i> {{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+      {% block content %}{% endblock %}
+    </section>
+  </main>
+</div>
+{% else %}{% block auth_content %}{% endblock %}{% endif %}
+<script>
+  (() => {
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem('billing-theme');
+    if (savedTheme) root.dataset.theme = savedTheme;
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle?.addEventListener('click', () => {
+      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      localStorage.setItem('billing-theme', next);
+      themeToggle.querySelector('i').className = next === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+    });
+    const menuButton = document.getElementById('menuButton');
+    menuButton?.addEventListener('click', () => {
+      const open = document.getElementById('sidebar').classList.toggle('is-open');
+      menuButton.setAttribute('aria-expanded', String(open));
+    });
+    const userMenu = document.getElementById('userMenu');
+    userMenu?.querySelector('.user-trigger')?.addEventListener('click', () => {
+      const open = userMenu.classList.toggle('is-open');
+      userMenu.querySelector('.user-trigger').setAttribute('aria-expanded', String(open));
+    });
+    document.querySelectorAll('.flash').forEach((toast) => setTimeout(() => toast.classList.add('is-leaving'), 4200));
+  })();
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

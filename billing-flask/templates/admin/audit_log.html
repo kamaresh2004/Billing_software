@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Audit log | {{ app_name }}{% endblock %}
+{% block page_heading %}Audit log{% endblock %}
+{% block content %}
+<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{{ url_for('admin_dashboard') }}">Workspace</a><i class="bi bi-chevron-right" aria-hidden="true"></i><span>Audit log</span></nav>
+<section class="page-intro"><div><p class="eyebrow">Security trail</p><h2>Audit activity</h2><p class="muted">Review important changes made by administrators and cashiers.</p></div></section>
+<section class="panel data-page-panel"><div class="table-wrap"><table><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Target</th><th>Details</th><th>IP</th></tr></thead><tbody>{% for entry in entries %}<tr><td>{{ entry.created_at.strftime('%Y-%m-%d %H:%M') if entry.created_at else '' }}</td><td>{{ entry.user_email }}</td><td><span class="badge badge-green">{{ entry.action|title }}</span></td><td>{{ entry.target_type or entry.module }} #{{ entry.target_id or entry.record_id }}</td><td>{{ entry.details or entry.description }}</td><td class="mono">{{ entry.ip_address or '-' }}</td></tr>{% else %}<tr><td colspan="6" class="empty-state"><i class="bi bi-shield-check empty-icon" aria-hidden="true"></i><strong>No audit events yet</strong></td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

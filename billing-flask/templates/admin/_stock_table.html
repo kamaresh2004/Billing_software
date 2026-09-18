@@ -1,0 +1,30 @@
+<script>
+// Populate the company filter dropdown once per load (safe to re-run)
+(function() {
+  const sel = document.getElementById('stockCompanyFilter');
+  if (sel) {
+    const current = sel.value;
+    const companies = {{ companies|tojson }};
+    sel.innerHTML = '<option value="All">All companies</option>' +
+      companies.map(c => `<option value="${c}" ${c === "{{ selected }}" ? "selected" : ""}>${c}</option>`).join('');
+  }
+})();
+</script>
+<table class="table table-striped table-hover align-middle">
+  <thead>
+    <tr><th>Product ID</th><th>Detail</th><th>Company</th><th class="numeric">Quantity</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    {% for p in products %}
+    <tr>
+      <td class="mono">{{ p.product_id }}</td>
+      <td>{{ p.detail }}</td>
+      <td>{{ p.company }}</td>
+      <td class="numeric">{{ p.quantity }}</td>
+      <td>{% if p.quantity == 0 %}<span class="badge badge-red">Out of stock</span>{% elif p.quantity < 10 %}<span class="badge badge-amber">Low stock</span>{% else %}<span class="badge badge-green">In stock</span>{% endif %}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" class="empty-state"><i class="bi bi-box-seam empty-icon" aria-hidden="true"></i><strong>No products found</strong><br>Try another company filter.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>

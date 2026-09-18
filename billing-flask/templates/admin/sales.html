@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Sales | {{ app_name }}{% endblock %}
+{% block page_heading %}Sales{% endblock %}
+{% block content %}
+<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{{ url_for('admin_dashboard') }}">Workspace</a><i class="bi bi-chevron-right" aria-hidden="true"></i><span>Sales</span></nav>
+<section class="page-intro"><div><p class="eyebrow">Transaction history</p><h2>Sales activity</h2><p class="muted">Review completed invoices, products, and cashier activity.</p></div><a class="button button-primary" href="{{ url_for('invoice_page') }}"><i class="bi bi-plus-lg" aria-hidden="true"></i> New sale</a></section>
+<section class="panel data-page-panel"><div class="panel-heading"><div><p class="eyebrow">Recent transactions</p><h3>Sales ledger</h3></div><span class="badge badge-green"><i class="bi bi-receipt" aria-hidden="true"></i> Up to 250 records</span></div><div class="filter-bar"><label class="field"><select id="salesCompanyFilter" aria-label="Filter sales by company"><option>All companies</option></select><span>Company</span></label><label class="field"><input id="salesDateFilter" type="date" aria-label="Filter sales by date" placeholder=" "><span>Date</span></label><span class="muted"><i class="bi bi-shield-check" aria-hidden="true"></i> Recorded transactions</span></div><div id="salesTable" class="ajax-table">{% include "admin/_sales_table.html" %}</div></section>
+{% endblock %}
+{% block scripts %}<script>
+const salesFilter = document.getElementById('salesCompanyFilter');
+const salesDate = document.getElementById('salesDateFilter');
+const refreshSales = () => document.getElementById('salesTable')?.classList.add('content-fade-in');
+salesFilter?.addEventListener('change', refreshSales);
+salesDate?.addEventListener('change', refreshSales);
+</script>{% endblock %}

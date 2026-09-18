@@ -177,6 +177,17 @@ class InvoiceCounter(db.Model):
     next_invoice_no = db.Column(db.Integer, nullable=False, default=1)
     year = db.Column(db.Integer, nullable=False, default=lambda: datetime.utcnow().year, server_default="2026")
 
+    @classmethod
+    def next(cls):
+        row = cls.query.first()
+        if row is None:
+            row = cls(next_invoice_no=1)
+            db.session.add(row)
+            db.session.flush()
+        current = row.next_invoice_no
+        row.next_invoice_no += 1
+        return current
+
 
 class Cart(db.Model):
     __tablename__ = "carts"
@@ -242,14 +253,3 @@ class PurchaseItem(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     cost_price = db.Column(db.Numeric(12, 2), nullable=False)
-
-    @classmethod
-    def next(cls):
-        row = cls.query.first()
-        if row is None:
-            row = cls(next_invoice_no=1)
-            db.session.add(row)
-            db.session.flush()
-        current = row.next_invoice_no
-        row.next_invoice_no += 1
-        return current

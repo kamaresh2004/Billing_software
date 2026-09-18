@@ -39,7 +39,11 @@ def configure_logging(app):
 
 
 def create_app(config_class=None):
-    application = Flask(__name__)
+    application = Flask(
+        __name__,
+        template_folder=os.path.join(BASE_DIR, "templates"),
+        static_folder=os.path.join(BASE_DIR, "static"),
+    )
     application.config.from_object(config_class or config_for_environment())
     db.init_app(application)
     migrate.init_app(application, db)
